@@ -1,7 +1,7 @@
 # TSD-KD
 Explain in Your Own Words: Improving Reasoning via Token-Selective Dual Knowledge Distillation
 
-#### Training from UltraInteract_sft [TSD-KD-Qwen2.5-1.5b-instruct](https://huggingface.co/datasets/Minsang/TSD-KD-Qwen2.5-1.5B-Instruct-Gen)
+#### Training from UltraInteract_sft [TSD-KD-Qwen2.5-1.5B-instruct-Dataset](https://huggingface.co/datasets/Minsang/TSD-KD-Qwen2.5-1.5B-Instruct-Gen). We provide the trained checkpoint, [TSD-KD-Qwen2.5-1.5B](https://huggingface.co/Minsang/TSD-KD_Qwen2.5-1.5B).
 Note: You only use the prompts during on-policy KD.
 * For off-policy distillation, you can also use teacher-generated data [TSD-KD-Qwen2.5-14b-instruct](https://huggingface.co/datasets/Minsang/TSD-KD-Qwen2.5-14B-Instruct-Gen) and train using LAMBDA=0.0.
 
