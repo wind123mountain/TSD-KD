@@ -16,6 +16,10 @@ model_name=str(sys.argv[4])
 import torch._dynamo
 torch._dynamo.config.disable = True
 
+from peft import get_peft_model, LoraConfig, TaskType
+
+
+
 def is_main_process():
     return not dist.is_initialized() or dist.get_rank() == 0
 
@@ -38,6 +42,16 @@ print(teacher_model.lm_head.weight.shape)
 
 assert model.lm_head.weight.shape[0] == teacher_model.lm_head.weight.shape[0]
 
+peft_config = LoraConfig(
+        task_type=TaskType.CAUSAL_LM, 
+        inference_mode=False, 
+        r=32, 
+        lora_alpha=64,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        lora_dropout=0.01
+    )
+model = get_peft_model(model, peft_config)
+
 ds = load_dataset("Minsang/TSD-KD-Qwen2.5-1.5B-Instruct-Gen")["train"].train_test_split(test_size=0.01)
 
 def add_messages(example):
@@ -58,10 +72,10 @@ training_args = GKDConfig(
                         num_train_epochs=3,
                         warmup_ratio=0.1,
                         per_device_eval_batch_size=4,
-                        per_device_train_batch_size=4,
-                        gradient_accumulation_steps=4,
+                        per_device_train_batch_size=8,
+                        gradient_accumulation_steps=2,
                         gradient_checkpointing=False,
-                        learning_rate=5e-6,
+                        learning_rate=5e-5,
                         eval_strategy='epoch',
                         save_strategy="epoch",
                          metric_for_best_model="eval_loss",
@@ -70,7 +84,7 @@ training_args = GKDConfig(
                         bf16=True, 
                         max_length=1024,
                         save_total_limit=3,
-                        report_to='wandb',
+                        report_to="none",
                         lmbda=lmbda,
                         beta=beta,
                         temperature=1.0,
